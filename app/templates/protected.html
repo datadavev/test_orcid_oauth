@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Protected page</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+<p>This page is a protected resource that is only reachable by an authenticated user.</p>
+<p>Auth information is provided by a session cookie or alternatively by a JWT bearer token
+  presented in the <code>Authorization</code> request header.</p>
+<p>For example:</p>
+<pre>
+TOKEN="{{data.id_token}}"
+curl -H "Authorization: Bearer ${TOKEN}" "http://localhost:8000/protected"
+</pre>
+<p>JWT Information</p>
+<dl>
+  <dt>Auth provider:</dt><dd>{{data.provider}}</dd>
+  <dt>JWT Claims:</dt><dd><pre>{{data.claims|tojson(2)}}</pre></dd>
+  <dt>Issued:</dt><dd id="issued_time"></dd>
+  <dt>Expires:</dt><dd id="expires_time"></dd>
+  <dt>Name:</dt><dd>{{data.claims.name}}</dd>
+  <dt>ORCID:</dt><dd>{{data.claims.sub}}</dd>
+</dl>
+<script>
+function token_time(t) {
+    let dtmp = new Date();
+    dtmp.setTime(t*1000);
+    return dtmp.toISOString();
+}
+
+document.querySelector("#issued_time").innerText = token_time({{data.claims.auth_time}});
+document.querySelector("#expires_time").innerText = token_time({{data.claims.exp}});
+
+</script>
+</body>
+</html>
