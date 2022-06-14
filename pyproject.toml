@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "test_auth"
+version = "0.1.0"
+description = "Testing orcid oauth with fastapi"
+authors = ["datadavev <605409+datadavev@users.noreply.github.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.78.0"
+uvicorn = "^0.17.6"
+httpx = "^0.23.0"
+itsdangerous = "^2.1.2"
+Authlib = "^1.0.1"
+starlette-oauth2-api = "^0.2.6"
+Jinja2 = "^3.1.2"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
