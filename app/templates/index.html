@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Info</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+{% if user %}
+<dl>
+    <dt>Name</dt><dd>{{user.name}}</dd>
+    <dt>orcid</dt><dd>{{user.orcid}}</dd>
+    <dt>Issued</dt><dd id="issued_time"></dd>
+    <dt>Expires</dt><dd id="expires_time"></dd>
+    <dt>JWT</dt><dd><pre style="max-width:800px; overflow: scroll;">{{user.id_token}}</pre><button id="bt_copy">Copy</button></dd>
+</dl>
+<details>
+    <summary>Full info</summary>
+    <pre style="white-space: pre-wrap; word-wrap: break-word">{{user|tojson(2)}}
+    </pre>
+</details>
+<p><a href="{{ protected_path }}/protected">Protected page</a></p>
+<p><a href="{{ protected_path }}/logout">Logout</a></p>
+
+<script>
+const JWT="{{user.id_token}}"
+
+function copy_jwt() {
+    navigator.clipboard.writeText(JWT);
+}
+
+function token_time(t) {
+    let dtmp = new Date();
+    dtmp.setTime(t*1000);
+    return dtmp.toISOString();
+}
+
+document.querySelector("#bt_copy").addEventListener("click", copy_jwt())
+document.querySelector("#issued_time").innerText = token_time({{user.userinfo.auth_time}});
+document.querySelector("#expires_time").innerText = token_time({{user.expires_at}});
+</script>
+{% else %}
+<p><a href="{{ protected_path }}/login">Login</a></p>
+{% endif %}
+</body>
+</html>

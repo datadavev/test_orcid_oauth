@@ -6,7 +6,16 @@
     <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
+<h3>App info</h3>
+<p>General informaton about this sub-application</p>
+<dl>
+    {% for key,value in app_info.items() %}
+    <dt>{{ key }}:</dt><dd>{{ value }}</dd>
+    {% endfor %}
+</dl>
 {% if user %}
+<h3>User info</h3>
+    <p>General information from the user session.</p>
 <dl>
     <dt>Name</dt><dd>{{user.name}}</dd>
     <dt>orcid</dt><dd>{{user.orcid}}</dd>
@@ -15,12 +24,20 @@
     <dt>JWT</dt><dd><pre style="max-width:800px; overflow: scroll;">{{user.id_token}}</pre><button id="bt_copy">Copy</button></dd>
 </dl>
 <details>
-    <summary>Full info</summary>
+    <summary>Full user info</summary>
     <pre style="white-space: pre-wrap; word-wrap: break-word">{{user|tojson(2)}}
     </pre>
 </details>
-<p><a href="/protected">Protected page</a></p>
-<p><a href="/logout">Logout</a></p>
+
+<h3>Invoke fetch call to {{ request.app.root_path }}/service</h3>
+    <p>Clicking the button below will invoke a <code>fetch</code> call to the
+    <code>{{ request.app.root_path }}/service</code> endpoint using Javascript.</p>
+<pre id="ta_service">
+</pre>
+<button id="bt_service">Fetch from service</button>
+
+<p><a href="{{ request.app.root_path }}/service">Service</a></p>
+<p><a href="{{ request.app.root_path }}/logout">Logout</a></p>
 
 <script>
 const JWT="{{user.id_token}}"
@@ -35,12 +52,22 @@ function token_time(t) {
     return dtmp.toISOString();
 }
 
+function load_from_service() {
+    fetch("/protected/service")
+        .then(response => response.json())
+        .then(data => {
+            const ta = document.getElementById("ta_service");
+            ta.innerText = JSON.stringify(data, null, 2)
+        });
+}
+
 document.querySelector("#bt_copy").addEventListener("click", copy_jwt())
 document.querySelector("#issued_time").innerText = token_time({{user.userinfo.auth_time}});
 document.querySelector("#expires_time").innerText = token_time({{user.expires_at}});
+document.getElementById("bt_service").onclick = load_from_service;
 </script>
 {% else %}
-<p><a href="/login">Login</a></p>
+<p><a href="{{ request.app.root_path }}/login">Login</a></p>
 {% endif %}
 </body>
 </html>
