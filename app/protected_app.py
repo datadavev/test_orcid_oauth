@@ -7,6 +7,7 @@ The following endpoints are provided:
   /logout   Invalidate credentials
   /         A page that returns an error if not authenticated
   /service  A simple service that returns some scope information for the request
+  /restricted Allow access to only specific ORCIDs
 
 The application defaults to `/protected` for the root path, though this
 may be set in the .env file with a `PROTECTED_PATH` property.
@@ -212,6 +213,20 @@ async def service(request: starlette.requests.Request):
         "id_token": request.scope["oauth2-jwt"],
     }
     return data
+
+
+@app.get("/restricted")
+async def service(request: starlette.requests.Request):
+    """
+    Only allow ORCID 0000-0002-6513-4996
+    """
+    allowed_ids = [
+        "0000-0002-6513-4996",
+    ]
+    claims = request.scope["oauth2-claims"]
+    if claims.get("sub") not in allowed_ids:
+        raise fastapi.HTTPException(status_code=401, detail="Not authorized")
+    return claims
 
 
 @app.get("/", response_class=fastapi.responses.HTMLResponse)
